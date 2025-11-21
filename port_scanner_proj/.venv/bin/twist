@@ -1,4 +1,4 @@
-#!/home/raj/Desktop/django/port_scanner_proj/.venv/bin/python3
+#!/home/raj/Desktop/django/port_scanner/port_scanner_proj/.venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
