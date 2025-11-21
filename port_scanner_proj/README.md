@@ -7,10 +7,10 @@ in terminal for run the project instead of "python3 manage.py runserver"
 firstly download some dependencies/libraries for this project
 
 step 1: create virtual environment
-    python3 -m venv .venv
+    <code> python3 -m venv .venv </code>
 step 2: activate it
-    source .venv/bin/activate
+    <code> source .venv/bin/activate </code>
 step 3: install dependencies using pip
     pip install ......
 step 4: shortcut for install all dependencies
-    pip install -r requirements.txt
+    <code> pip install -r requirements.txt </code>
