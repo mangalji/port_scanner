@@ -7,15 +7,15 @@ class PortScanConsumer(WebsocketConsumer):
 
     def connect(self):
         self.accept()
-        self.send("connected sockets")
 
     def receive(self, text_data):
         # print("raw data: ",text_data)  
         data = json.loads(text_data)
         # print("parsed json data: ",data)
-        host = data['host']
+        ip = data['host']
         # print(f"host: {host}")
         nm = nmap.PortScanner()
+        host = socket.gethostbyname(ip)
 
         if data['mode'] == 'single':
             port = str(data['port'])
@@ -49,3 +49,4 @@ class PortScanConsumer(WebsocketConsumer):
                 self.send(json.dumps({"port":port,"status":state}))
 
             self.send(json.dumps({"done":True}))
+
