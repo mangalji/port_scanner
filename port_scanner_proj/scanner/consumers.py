@@ -1,14 +1,21 @@
 import json
 import socket
 import nmap
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
+# from channels.generic.websocket import WebsocketConsumer
+import asyncio
 
-class PortScanConsumer(WebsocketConsumer):
+class PortScanConsumer(AsyncWebsocketConsumer):
 
-    def connect(self):
-        self.accept()
+    # def connect(self):
+    #     self.accept()
 
-    def receive(self, text_data):
+    async def connect(self):
+        await self.accept()
+
+    # def receive(self,text_data):
+
+    async def receive(self, text_data):
         # print("raw data: ",text_data)  
         data = json.loads(text_data)
         # print("parsed json data: ",data)
@@ -19,26 +26,37 @@ class PortScanConsumer(WebsocketConsumer):
 
         if data['mode'] == 'single':
             port = str(data['port'])
-            nm.scan(hosts=host, ports=port, arguments="-Pn")
+            
+            await asyncio.to_thread(nm.scan, hosts=host, ports=port, arguments="-Pn")
+
+            # nm.scan(hosts=host, ports=port, arguments="-Pn")
 
             if host not in nm.all_hosts():
-                self.send(json.dumps({"error": f"{host} is not reachable"}))
+                # self.send(json.dumps({"error": f"{host} is not reachable"}))
+                await self.send(json.dumps({"error": f"{host} is not reachable"}))
                 return 
 
             state = nm[host]['tcp'][int(port)]['state']
 
             print(f"host: {host}, port: {port}, status: {state}")
 
-            self.send(json.dumps({
+            # self.send(json.dumps({
+            #     "port":port,
+            #     "status": state
+            # }))
+
+            await self.send(json.dumps({
                 "port":port,
                 "status": state
             }))
 
         elif data["mode"] == 'all':
-            nm.scan(hosts=host,ports='1-65535',arguments="-Pn")
+            # nm.scan(hosts=host, ports=port, arguments="-Pn")
+            await asyncio.to_thread( nm.scan, hosts=host,ports='1-65535',arguments="-Pn")
 
             if host not in nm.all_hosts():
-                self.send(json.dumps({"error": f"host {host} is not reachable."}))
+                # self.send(json.dumps({"error": f"host {host} is not reachable."}))
+                await self.send(json.dumps({"error": f"host {host} is not reachable."}))
                 return 
 
             for port in nm[host]['tcp']:
@@ -46,7 +64,9 @@ class PortScanConsumer(WebsocketConsumer):
 
                 if state == 'open':
                     print(f"host: {host}, port: {port}, status: {state}")
-                self.send(json.dumps({"port":port,"status":state}))
+                # self.send(json.dumps({"port":port,"status":state}))
+                await self.send(json.dumps({"port":port,"status":state}))
 
-            self.send(json.dumps({"done":True}))
+            # self.send(json.dumps({"done":True}))
+            await self.send(json.dumps({"done":True}))
 
