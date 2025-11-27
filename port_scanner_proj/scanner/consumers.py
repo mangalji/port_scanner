@@ -27,9 +27,9 @@ class PortScanConsumer(AsyncWebsocketConsumer):
         if data['mode'] == 'single':
             port = str(data['port'])
             
-            await asyncio.to_thread(nm.scan, hosts=host, ports=port, arguments="-Pn")
-
             # nm.scan(hosts=host, ports=port, arguments="-Pn")
+            await asyncio.to_thread(nm.scan, hosts=host, ports=port,  arguments="-Pn")
+
 
             if host not in nm.all_hosts():
                 # self.send(json.dumps({"error": f"{host} is not reachable"}))
@@ -69,4 +69,3 @@ class PortScanConsumer(AsyncWebsocketConsumer):
 
             # self.send(json.dumps({"done":True}))
             await self.send(json.dumps({"done":True}))
-
