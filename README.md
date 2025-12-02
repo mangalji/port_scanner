@@ -1,8 +1,10 @@
 # port_scanner
 this is a django project which shows the open ports of ip address means which port is open or closed, this port_scanner is based on websocket.
-use command "python3 -m daphne -p 8000 port_scan.asgi:application"
-in terminal for run the project instead of "python3 manage.py runserver"
-
+use command: <br>
+<code>"python3 -m daphne -p 8000 port_scan.asgi:application"</code>
+<br>
+in terminal for run the project instead of "<code>python3 manage.py runserver</code>"<br><br>
+<strong>8000 means port number</strong> in command<br><br>
 
 firstly download some dependencies/libraries for this project
 
