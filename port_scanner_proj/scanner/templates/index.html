@@ -51,6 +51,20 @@
             color: #f87171;
             font-weight: bold;
         }
+        #loader {
+            display: none;
+            font-size: 18px;
+            margin: 10px 0;
+            animation: pulse 1.2s infinite;
+        }
+        #live_time, #live_progress {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -72,10 +86,218 @@
     <button onclick="scanAll()">Scan All (1–65535)</button>
 </div>
 
+<div id="loader">Scanning... Please wait</div>
+<div id="live_time" style="display:none;">⏱ Time: 0.0s</div>
+{% comment %} <div id="live_progress" style="display:none;">Scanned Ports: 0 / 0</div> {% endcomment %}
+
 <div id="results"></div>
 
 <script>
     let socket = null;
+    let timer = null;
+    let startTime = null;
+
+    function safeSend(data) {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify(data));
+        }
+    }
+
+    function connectSocket(callback) {
+        socket = new WebSocket("ws://localhost:8000/ws/scan/");
+
+        socket.onopen = () => callback();
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            if (startTime === null){
+                startTime = Date.now();
+                timer = setInterval(() => {
+                    const elapsed = ((Date.now() - startTime)/ 1000).toFixed(1);
+                    document.getElementById("live_time").innerText = `Time: ${elapsed}s`;
+                },100);
+            }
+
+
+            const box = document.getElementById("results");
+
+            // ERROR
+            if (data.error) {
+                box.innerHTML += `<div class="error">ERROR: ${data.error}</div>`;
+                return;
+            }
+
+            // STATUS
+            if (data.status) {
+                if (data.status === "open") {
+                    box.innerHTML += `<div class="open-port">[OPEN] Port ${data.port}</div>`;
+                } else {
+                    box.innerHTML += `<div class="closed-port">[CLOSED] Port ${data.port}</div>`;
+                }
+            }
+
+            // SERVICE INFO
+            if (data.service) {
+                box.innerHTML += `<div style="color:#38bdf8">Service: ${data.service}</div>`;
+            }
+
+            // DONE
+            if (data.done) {
+                clearInterval(timer);
+                document.getElementById("loader").style.display = "none";
+                box.innerHTML += `<div>✔ Scan Finished</div>`;
+            }
+
+            // FINAL TIME
+            if (data.time) {
+                box.innerHTML += `<div>⏱ Scan completed in <b>${data.time} seconds</b></div>`;
+            }
+
+            box.scrollTop = box.scrollHeight;
+        };
+
+        socket.onclose = () => console.log("WebSocket Closed");
+    }
+
+    // SINGLE PORT SCAN
+    function scanSingle() {
+        document.getElementById("results").innerHTML = "";
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("live_time").style.display = "none";
+
+        const host = document.getElementById("host").value;
+        const port = document.getElementById("single_port").value;
+
+        connectSocket(() => {
+            safeSend({ mode: "single", host: host, port: port });
+        });
+    }
+
+    // FULL RANGE SCAN
+    function scanAll() {
+        document.getElementById("results").innerHTML = "";
+        document.getElementById("loader").style.display = "block";
+        document.getElementById("live_time").style.display = "block";
+        document.getElementById("live_time").innerText = "⏱ Time: 0.0s";
+
+        const host = document.getElementById("host").value;
+
+        connectSocket(() => {
+            safeSend({ mode: "all", host: host });
+        });
+    }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-Time Port Scanner</title>
+
+    <style>
+        body {
+            background: #0b0f19;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
+        .box {
+            background: #111827;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            width: 200px;
+            border-radius: 5px;
+            border: none;
+            margin-top: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #results {
+            background: #1f2937;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            border-radius: 10px;
+            font-family: monospace;
+        }
+        .open-port {
+            color: #22c55e;
+        }
+        .closed-port {
+            color: #ef4444;
+        }
+        .error {
+            color: #f87171;
+            font-weight: bold;
+        }
+        #loader {
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+<h1>🔍 Real-Time Port Scanner</h1>
+
+<div class="box">
+    <label>Target Host / IP:</label><br>
+    <input id="host" placeholder="192.168.1.1">
+
+    <br><br>
+
+    <label>Port (for single scan):</label><br>
+    <input id="single_port" type="number" placeholder="80">
+
+    <br><br>
+
+    <button onclick="scanSingle()">Scan Single Port</button>
+    <button onclick="scanAll()">Scan All (1–65535)</button>
+</div>
+
+<div id="loader" style="display:none; font-size:18px; margin:10px;">
+     Scanning... Please wait</div>
+     <div id="live_time"> Time: 0.0s</div>
+     <div id="live_progress"> Scanned Ports: 0 / 0</div>
+
+
+<div id="results"></div>
+
+<script>
+    let socket = null;
+    let timer = null;
+    let startTime = null;
 
     // Safe WebSocket sender
     function safeSend(data) {
@@ -101,17 +323,28 @@
             if (data.error) {
                 box.innerHTML += `<div class="error">ERROR: ${data.error}</div>`;
             }
-
-            if (data.status === "open") {
-                box.innerHTML += `<div class="open-port">[OPEN] Port ${data.port}</div>`;
-            } else if (data.status !== "open") {
+            if (data.status){
+                if (data.status === "open") {
+                    box.innerHTML += `<div class="open-port">[OPEN] Port ${data.port}</div>`;
+                } else {
                 box.innerHTML += `<div class="closed-port">[CLOSED] Port ${data.port}</div>`;
             }
 
+        }
+    
+        
+        if (data.service) {
+            box.innerHTML += `<div style="color:#38bdf8">Service: ${data.service}</div>`;
+        }
+        if (data.progress){
+            document.getElementById("live_progress").innerText = `Scanned Ports: ${data.progress} / ${data.total}`;
             if (data.done) {
+                document.getElementById("loader").style.display = "none";
                 box.innerHTML += `<div>Scan Finished ✔</div>`;
-            }
-
+        }
+        if (data.time){
+            box.innerHTML += `<div> scan completedin <b>${data.time} seconds</b></div>`
+        }
             box.scrollTop = box.scrollHeight;
         };
 
@@ -119,6 +352,8 @@
     }
 
     // ---------------- SINGLE PORT SCAN ----------------
+    
+
     function scanSingle() {
         document.getElementById("results").innerHTML = "";
 
@@ -134,9 +369,19 @@
         });
     }
 
-    // ---------------- FULL PORT RANGE SCAN ----------------
     function scanAll() {
         document.getElementById("results").innerHTML = "";
+        document.getElementById("loader").style.display = "block";
+
+        document.getElementById("live_progress").innerText = "Scanned Ports: 0 / 0";
+        document.getElementById("live_time").innerText = "Time: 0.0s";
+
+        startTime = Date.now()
+
+        timer = setInterval(() => {
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+            document.getElementById("live_time").innerText = `Time: ${elapsed}s`;
+        }, 100);
 
         const host = document.getElementById("host").value;
 
@@ -151,4 +396,4 @@
 </script>
 
 </body>
-</html>
+</html> {% endcomment %}
