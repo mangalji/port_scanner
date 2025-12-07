@@ -146,12 +146,8 @@
             if (data.done) {
                 clearInterval(timer);
                 document.getElementById("loader").style.display = "none";
-                box.innerHTML += `<div>✔ Scan Finished</div>`;
-            }
+                box.innerHTML += `<div style="color:#22c55e; font-weight:bold;">Scan Completed Successfully</div>`;
 
-            // FINAL TIME
-            if (data.time) {
-                box.innerHTML += `<div>⏱ Scan completed in <b>${data.time} seconds</b></div>`;
             }
 
             box.scrollTop = box.scrollHeight;

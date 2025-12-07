@@ -7,7 +7,7 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import time
 
-thread_pool = ThreadPoolExecutor(max_workers=2000)
+thread_pool = ThreadPoolExecutor(max_workers=1000)
 
 
 
@@ -18,6 +18,9 @@ class PortScanConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         await self.accept()
+
+    async def disconnect(self,close_code):
+        pass
 
     # def receive(self,text_data):
 
@@ -51,17 +54,10 @@ class PortScanConsumer(AsyncWebsocketConsumer):
             state = nm[host]['tcp'][int(port)]['state']
             service = nm[host]['tcp'][int(port)].get('product','') + " " + nm[host]['tcp'][int(port)].get('version','')
             service = service.strip() if service else 'unknown service'
-
             
-
-            #adding the os and service detecion feature.
-            # os_info = "Unknown OS"
-            # if 'osmatch' in nm[host] and len(nm[host]['osmatch']) > 0:
-            #     os_info = nm[host]['osmatch'][0]['name']  # Best OS guess
+            #adding service detecion feature.
 
             print(f"host: {host}, port: {port}, status: {state}, 'service':{service}")
-            
-            # await self.send(json.dumps({"os": os_info}))
 
             # self.send(json.dumps({
             #     "port":port,
@@ -77,7 +73,7 @@ class PortScanConsumer(AsyncWebsocketConsumer):
         elif data["mode"] == 'all':
             start_time = time.perf_counter()
             # nm.scan(hosts=host, ports=port, arguments="-Pn")
-            # await asyncio.to_thread( nm.scan, hosts=host,ports='1-65535',arguments="-Pn")
+
             await loop.run_in_executor(thread_pool,nm.scan,host,'1-65535','-Pn -sV')
 
             if host not in nm.all_hosts():
@@ -105,5 +101,5 @@ class PortScanConsumer(AsyncWebsocketConsumer):
             print("total time taken by this port scanner: ",total_time)
 
             # self.send(json.dumps({"done":True}))
-            await self.send(json.dumps({"done":True,"time":total_time}))
+            await self.send(json.dumps({"done":True}))
 
