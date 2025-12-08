@@ -1,4 +1,4 @@
-# Real-Time Port Scanner (Django + WebSockets + Nmap)
+# Real-Time Port Scanner (Django)
 
 ## Overview
 
