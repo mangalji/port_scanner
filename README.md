@@ -1,6 +1,6 @@
-# 🔍 Real-Time Port Scanner (Django + WebSockets + Nmap)
+# Real-Time Port Scanner (Django + WebSockets + Nmap)
 
-## 📌 Overview
+## Overview
 
 This project is a **real-time network port scanner** built using **Django**, **Django Channels (WebSockets)**, and **Nmap**(nmap for accuracy). It allows users to scan single or multiple ports on any publicly accessible host and view results instantly in the browser — no page reloads required.
 
@@ -10,18 +10,18 @@ Traditional scanners run in the terminal, but this one provides a **web-based UI
 
 ## 🚀 Features
 
-- ⚡ Real-time port scanning output
-- 🎯 Single port scan (fast and accurate)
-- 🌐 Full port range scan (`-p-`)
-- 🔍 Service & version detection (`-sV`)
-- 🔁 Loader animation during scanning
-- 🕒 Live scan timer
-- 🧭 Asynchronous WebSocket-based updates
-- 🖥️ Clean and responsive UI
+-  Real-time port scanning output
+-  Single port scan (fast and accurate)
+-  Full port range scan (`-p-`)
+-  Service & version detection (`-sV`)
+-  Loader animation during scanning
+-  Live scan timer
+-  Asynchronous WebSocket-based updates
+-  Clean and responsive UI
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |------|------------|
@@ -33,7 +33,7 @@ Traditional scanners run in the terminal, but this one provides a **web-based UI
 
 ---
 
-## 🎯 How It Works
+## How It Works
 
 1. User inputs a target host (e.g., `scanme.nmap.org`)
 2. The frontend opens a WebSocket connection
@@ -48,7 +48,7 @@ Traditional scanners run in the terminal, but this one provides a **web-based UI
 
 ---
 
-## 🧪 Demo Output (Example)
+## Demo Output (Example)
 
 ```
 ⏱ Time: 11.7s
@@ -61,16 +61,16 @@ Service: Apache 2.4.58
 
 ---
 
-## 📦 Installation & Setup
+## Installation & Setup
 
-### 🔧 Requirements
+### Requirements
 
 - Python 3.10+
 - Django
 - Django Channels
 - Nmap installed on system
 
-### 📥 Install dependencies
+### Install dependencies
 
 ```bash
 sudo apt install nmap
@@ -123,16 +123,16 @@ http://127.0.0.1:8000/
 
 ---
 
-## 🚧 Future Enhancements
+## Future Enhancements
 
-- 📤 Export scan results (CSV)
-- 📊 Graphical progress bar
-- 🛡️ OS fingerprinting (`-O`) — requires sudo
-- 📁 Save scan history
+- Export scan results (CSV)
+- Graphical progress bar
+- OS fingerprinting (`-O`) — requires sudo
+- Save scan history
 
 ---
 
-## 📌 Why This Project Is Valuable
+## Why This Project Is Valuable
 
 This project demonstrates:
 
