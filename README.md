@@ -148,7 +148,7 @@ Perfect for **resume**, **portfolio**, and **security-related interviews**.
 
 ## 👤 Author
 
-**Raj**  
+**Raj Mangal**  
 A developer exploring the intersection of networking, automation, and web technologies.
 
 ---
